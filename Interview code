@@ -1,0 +1,72 @@
+Function Jim_Weekly_Service(First_Date As String)
+Dim dbs As DAO.Database
+Dim Rst As DAO.Recordset
+Dim RstContact As DAO.Recordset
+
+Dim MyOutlook As Outlook.Application 'Oulook to send emails
+Dim MyMail As Object            'outlook email
+Dim BodyFile As String
+
+Set dbs = CurrentDb
+On Error GoTo 0
+Set ObjXL = New Excel.Application
+    With ObjXL
+        'Summary Sheet Info Start
+        .Application.DisplayAlerts = False
+        .Application.ScreenUpdating = False
+        
+        .Workbooks.Open FileName:="S:\Central\Centre for excellence\Supply Chain\Databases\Outbound\Weekly Service History.xlsx"
+        .ActiveWorkbook.RefreshAll
+        .ActiveWorkbook.Save
+        DoEvents
+        .ActiveWorkbook.Close
+        
+        .Workbooks.Open FileName:="S:\Central\Centre for excellence\Supply Chain\Databases\Outbound\Weekly Service History Oliver Kay.xlsx"
+        .ActiveWorkbook.RefreshAll
+        .ActiveWorkbook.Save
+        DoEvents
+        .ActiveWorkbook.Close
+        
+        .Application.ScreenUpdating = True
+        .Application.DisplayAlerts = True
+        
+    End With
+Set ObjXL = Nothing
+
+'#######################oliver kay
+Set MyOutlook = New Outlook.Application
+Set MyMail = MyOutlook.CreateItem(olMailItem)
+    MyMail.BodyFormat = olFormatHTML
+    MyMail.To = "bob@oliverkayproduce.co.uk"
+    MyMail.SentOnBehalfOfName = "SupplyChainReporting@bidfood.co.uk"
+    MyMail.Subject = "FTOF FCA - Oliver Kay Weekly Service Report - W/C - " & Format(First_Date, "DD/MM/YY")
+    MyMail.HTMLBody = "Please find attached last weeks outbound service report by customer"
+    
+    MyMail.Attachments.Add "S:\Central\Centre for excellence\Supply Chain\Databases\Outbound\Weekly Service History Oliver Kay.xlsx"
+    
+    MyMail.DeleteAfterSubmit = True
+    MyMail.Send
+    
+Set MyOutlook = Nothing
+Set MyMail = Nothing
+
+'#############bidfood
+Set MyOutlook = New Outlook.Application
+Set MyMail = MyOutlook.CreateItem(olMailItem)
+    MyMail.BodyFormat = olFormatHTML
+    MyMail.To = "bob@oliverkayproduce.co.uk"
+    MyMail.CC = "Geoff @bidfoood.co.uk
+    MyMail.SentOnBehalfOfName = "SupplyChainReporting@bidfood.co.uk"
+    MyMail.Subject = "FTOF FCA - Weekly Service Report - W/C - " & Format(First_Date, "DD/MM/YY")
+    MyMail.HTMLBody = "Please find attached last weeks outbound service report by customer"
+    
+    MyMail.Attachments.Add "S:\Central\Centre for excellence\Supply Chain\Databases\Outbound\Weekly Service History.xlsx"
+    
+    MyMail.DeleteAfterSubmit = True
+    MyMail.Send
+    
+Set MyOutlook = Nothing
+Set MyMail = Nothing
+
+Set dbs = Nothing
+End Function
